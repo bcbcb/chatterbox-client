@@ -95,19 +95,32 @@ app.handleSubmit = function () {
 app.displayRooms = function () {
 //Iterate through the objects on the GET request
   var rooms = {};
-  var roomNames = [];
+  var message;
+
   for (var key in app.messages) {
     //Create an object to store all room names
-    if (rooms[app.messages[key]['roomname']]) {
-      rooms[app.messages[key]['roomname']] += 1; //increment if the key already exists
-    } else {
-      rooms[app.messages[key]['roomname']] = 1; //set to 1 if a new key
+    if (rooms[app.messages[key]['roomname']] === undefined) {
+      rooms[app.messages[key]['roomname']] = [];
     }
+    rooms[app.messages[key]['roomname']].push(app.messages[key]); //increment if the key already exists
   }
+
   for (var room in rooms) {
-    roomNames.push('<li>' + room + '</li>');
+    var tab = '<li role="presentation" class="tabber"><a href="#' + room + '" aria-controls="profile" role="tab" data-toggle="tab">' + room + '</a></li>';
+    var tabPane = '<div role="tabpanel" class="tab-pane" id="' + room +'"><ul></ul></div>';
+    var elements = [];
+    $('.nav-tabs').append(tab);
+    $('.tab-content').append(tabPane);
+
+    for (var messageKey in rooms[room]) {
+      console.log(rooms[room][messageKey]);
+      message = rooms[room][messageKey];
+      if (message['username'] !== undefined) {
+        elements.push("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message['roomname']) + "</strong>: " + app.escapeHtml(message['text']) + "</li>");
+      }
+    }
+    $('#' + room + ' ul').append(elements.join(''));
   }
-  $('.rooms').append(roomNames.join(''));
 };
 
 app.init();
