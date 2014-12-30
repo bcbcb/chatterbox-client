@@ -1,40 +1,16 @@
-// *
-//  * Init
-//  *   get list of rooms orederd by -createdAt
-//  *   display rooms messages (HackReactor)
-//  *   start setinterval
-//  *     refresh messages for current room
-//  *     refresh list of rooms
-//  *       clearmessages
-//  *       refetch
-//  *
-//  * Send
-//  *   send via ajax to current room x
-//  *   prepend to current room x
-//  *
-//  * UI
-//  *   dropdown
-//  *     show list of rooms
-//  *     clicking on room switches room
-//  *
-//  *
-//  *
-//  *
-
-
 var app = {};
 app.room = 'HackReactor';
-app.rooms;
 app.server = 'https://api.parse.com/1/classes/chatterbox';
+app.friends = [];
 
 app.init = function () {
-  this.fetch(app.room);
   app.rooms = this.getRooms();
   app.createDropDown(app.rooms);
+  this.fetch(app.room);
   setInterval( function() {
     app.fetch(app.room);
     app.createDropDown(app.rooms);
-  }, 5000);
+  }, 500);
 };
 
 app.fetch = function (room) {
@@ -46,7 +22,6 @@ app.fetch = function (room) {
       where: { "roomname": room }
     },
     success: function (data) {
-      // console.log(data.results);
       app.messages = data.results;
     },
     complete: app.displayMessages
@@ -62,7 +37,6 @@ app.getRooms = function () {
       order: "-createdAt",
     },
     success: function (data) {
-      //console.log(data.results);
       return roomStorage(data.results);
     }
   });
@@ -102,7 +76,7 @@ app.send = function (message) {
 
 
 app.addMessage = function (message) {
-  $('#chats').prepend("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text)  + "</li>");
+  $('#chats').prepend("<li class='list-group-item'>" + "<strong class='username'>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text)  + "</li>");
 };
 
 app.displayMessages = function () {
@@ -110,7 +84,7 @@ app.displayMessages = function () {
   var elements = [];
   for (var i = 0; i < app.messages.length; i++) {
     if (app.messages[i]['username'] !== undefined) {
-      elements.push("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(app.messages[i]['username']) + "</strong>: " + app.escapeHtml(app.messages[i]['text']) + "</li>");
+      elements.push("<li class='list-group-item'>" + "<strong class='username'>" + app.escapeHtml(app.messages[i]['username']) + "</strong>: " + app.escapeHtml(app.messages[i]['text']) + "</li>");
     }
   }
   $('ul#chats').append(elements.join(''));
@@ -172,6 +146,12 @@ app.handleSubmit = function () {
   };
   app.send(message);
   $('#message').val('');
+};
+
+app.addFriend = function (username) {
+  if (app.friends.indexOf(username) === -1) {
+    app.friends.push(username);
+  }
 };
 
 app.init();

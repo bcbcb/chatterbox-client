@@ -9,9 +9,16 @@ $(document).ready(function () {
 
   $('body').on('click', '#roomMenu .roomName', function (e) {
     e.preventDefault();
-    console.log($(this).text());
     app.fetch($(this).text());
     app.room = $(this).text();
     $('h1').text(app.room);
   });
+
+  $('h1').text(app.room);
+
+  $('body').on('click', '.username', function (e) {
+    e.preventDefault();
+    app.addFriend($(this).text());
+  });
+
 });
