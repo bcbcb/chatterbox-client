@@ -1,12 +1,84 @@
+// *
+//  * Init
+//  *   get list of rooms orederd by -createdAt
+//  *   display rooms messages (HackReactor)
+//  *   start setinterval
+//  *     refresh messages for current room
+//  *     refresh list of rooms
+//  *       clearmessages
+//  *       refetch
+//  *
+//  * Send
+//  *   send via ajax to current room x
+//  *   prepend to current room x
+//  *
+//  * UI
+//  *   dropdown
+//  *     show list of rooms
+//  *     clicking on room switches room
+//  *
+//  *
+//  *
+//  *
+
+
 var app = {};
+app.room = 'HackReactor';
+app.rooms;
 app.server = 'https://api.parse.com/1/classes/chatterbox';
 
 app.init = function () {
-  this.fetch();
-  app.displayRooms();
+  this.fetch(app.room);
+  app.rooms = this.getRooms();
+  app.createDropDown(app.rooms);
   setInterval( function() {
-    app.displayMessages();
+    app.fetch(app.room);
+    app.createDropDown(app.rooms);
   }, 5000);
+};
+
+app.fetch = function (room) {
+  $.ajax({
+    url: app.server,
+    type: 'GET',
+    data: {
+      order: "-createdAt",
+      where: { "roomname": room }
+    },
+    success: function (data) {
+      // console.log(data.results);
+      app.messages = data.results;
+    },
+    complete: app.displayMessages
+  });
+};
+
+app.getRooms = function () {
+  var rooms = {};
+  $.ajax({
+    url: app.server,
+    type: 'GET',
+    data: {
+      order: "-createdAt",
+    },
+    success: function (data) {
+      //console.log(data.results);
+      return roomStorage(data.results);
+    }
+  });
+
+  var roomStorage = function (data) {
+
+    for (var key in data) {
+      var roomName = app.escapeHtml(data[key]['roomname']);
+
+      if (rooms[roomName] === undefined) {
+        rooms[roomName] = true;
+      }
+    }
+  };
+
+  return rooms;
 };
 
 app.send = function (message) {
@@ -24,41 +96,37 @@ app.send = function (message) {
     },
     complete: function() {
       app.addMessage(message);
-      app.displayRooms();
     }
   });
 };
 
-app.fetch = function () {
-  $.ajax({
-    url: app.server + '?order=-createdAt',
-    type: 'GET',
-    success: this.displayMessages,
-    complete: this.displayRooms
-  });
-};
 
 app.addMessage = function (message) {
-  //$('#chats').prepend("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text)  + "</li>");
-  console.log(message['roomname']);
-  var element = "<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message['username']) + "</strong>: " + app.escapeHtml(message['text']) + "</li>";
-  console.log(element);
-  $('#' + message['roomname'] + ' ul').prepend(element);
-  app.displayMessages();
-
+  $('#chats').prepend("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text)  + "</li>");
 };
 
-app.displayMessages = function (data) {
-  // app.clearMessages();
-  app.messages = data.results;
+app.displayMessages = function () {
+  app.clearMessages();
   var elements = [];
   for (var i = 0; i < app.messages.length; i++) {
-    //console.log(app.messages[i].username + " " + app.messages[i].roomname) ;
     if (app.messages[i]['username'] !== undefined) {
       elements.push("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(app.messages[i]['username']) + "</strong>: " + app.escapeHtml(app.messages[i]['text']) + "</li>");
     }
   }
   $('ul#chats').append(elements.join(''));
+};
+
+app.createDropDown = function (rooms) {
+  $('#roomMenu').empty();
+  var roomNames = [];
+  var elements = [];
+  for (var key in rooms) {
+    roomNames.push(key);
+  }
+  for (var i = 0; i < roomNames.length; i++) {
+    elements.push("<li><a href='#' class='roomName'>" + roomNames[i] + "</a></li>");
+  }
+  $("#roomMenu").append(elements.join(''));
 };
 
 app.clearMessages = function () {
@@ -100,43 +168,10 @@ app.handleSubmit = function () {
   var message = {
     'username' : username,
     'text' : text,
-    'roomname' : 'HackReactor'
+    'roomname' : app.room
   };
   app.send(message);
   $('#message').val('');
-};
-
-
-app.displayRooms = function () {
-  app.clearMessages();
-  var rooms = {};
-  var message;
-
-  for (var key in app.messages) {
-    var roomName = app.escapeHtml(app.messages[key]['roomname']);
-    var messageObj = app.messages[key];
-
-    if (rooms[roomName] === undefined) {
-      rooms[roomName] = [];
-    }
-    rooms[roomName].push(messageObj);
-  }
-
-  for (var room in rooms) {
-    var tab = '<li role="presentation" class="tabber"><a href="#' + app.escapeHtml(room) + '" aria-controls="profile" role="tab" data-toggle="tab">' + app.escapeHtml(room) + '</a></li>';
-    var tabPane = '<div role="tabpanel" class="tab-pane" id="' + app.escapeHtml(room) +'"><ul></ul></div>';
-    var elements = [];
-    $('.nav-tabs').append(tab);
-    $('.tab-content').append(tabPane);
-
-    for (var messageKey in rooms[room]) {
-      message = rooms[room][messageKey];
-      if (message['username'] !== undefined) {
-        elements.push("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message['username']) + "</strong>: " + app.escapeHtml(message['text']) + "</li>");
-      }
-    }
-    $('#' + room + ' ul').append(elements.join(''));
-  }
 };
 
 app.init();

@@ -7,4 +7,11 @@ $(document).ready(function () {
     $(this).tab('show');
   });
 
+  $('body').on('click', '#roomMenu .roomName', function (e) {
+    e.preventDefault();
+    console.log($(this).text());
+    app.fetch($(this).text());
+    app.room = $(this).text();
+    $('h1').text(app.room);
+  });
 });
