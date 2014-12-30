@@ -1,11 +1,11 @@
-// YOUR CODE HERE:
 var app = {};
 app.server = 'https://api.parse.com/1/classes/chatterbox';
 
 app.init = function () {
   this.fetch();
+  app.displayRooms();
   setInterval( function() {
-    app.fetch();
+    app.displayRooms();
   }, 5000);
 };
 
@@ -17,15 +17,14 @@ app.send = function (message) {
     data: JSON.stringify(message),
     contentType: 'application/json',
     success: function (data) {
-      console.log('Successfully added: ' + data);
-      console.log(data);
+      console.log('Successfully added');
     },
     error: function (data) {
       console.log('Unsuccessful');
     },
     complete: function() {
       app.addMessage(message);
-      app.fetch();
+      app.displayRooms();
     }
   });
 };
@@ -34,7 +33,8 @@ app.fetch = function () {
   $.ajax({
     url: app.server + '?order=-createdAt',
     type: 'GET',
-    success: this.displayMessages
+    success: this.displayMessages,
+    complete: this.displayRooms
   });
 };
 
@@ -43,7 +43,7 @@ app.addMessage = function (message) {
 };
 
 app.displayMessages = function (data) {
-  app.clearMessages();
+  // app.clearMessages();
   app.messages = data.results;
   var elements = [];
   for (var i = 0; i < app.messages.length; i++) {
@@ -57,6 +57,8 @@ app.displayMessages = function (data) {
 
 app.clearMessages = function () {
   $('#chats').empty();
+  $('.nav-tabs').empty();
+  $('.tab-content ul').empty();
 };
 
 app.addRoom = function (room) {
@@ -85,7 +87,7 @@ app.handleSubmit = function () {
   var message = {
     'username' : username,
     'text' : text,
-    'roomname' : 'Hack Reactor'
+    'roomname' : 'HackReactor'
   };
   app.send(message);
   $('#message').val('');
@@ -93,30 +95,31 @@ app.handleSubmit = function () {
 
 
 app.displayRooms = function () {
-//Iterate through the objects on the GET request
+  app.clearMessages();
   var rooms = {};
   var message;
 
   for (var key in app.messages) {
-    //Create an object to store all room names
-    if (rooms[app.messages[key]['roomname']] === undefined) {
-      rooms[app.messages[key]['roomname']] = [];
+    var roomName = app.escapeHtml(app.messages[key]['roomname']);
+    var messageObj = app.messages[key];
+
+    if (rooms[roomName] === undefined) {
+      rooms[roomName] = [];
     }
-    rooms[app.messages[key]['roomname']].push(app.messages[key]); //increment if the key already exists
+    rooms[roomName].push(messageObj);
   }
 
   for (var room in rooms) {
-    var tab = '<li role="presentation" class="tabber"><a href="#' + room + '" aria-controls="profile" role="tab" data-toggle="tab">' + room + '</a></li>';
-    var tabPane = '<div role="tabpanel" class="tab-pane" id="' + room +'"><ul></ul></div>';
+    var tab = '<li role="presentation" class="tabber"><a href="#' + app.escapeHtml(room) + '" aria-controls="profile" role="tab" data-toggle="tab">' + app.escapeHtml(room) + '</a></li>';
+    var tabPane = '<div role="tabpanel" class="tab-pane" id="' + app.escapeHtml(room) +'"><ul></ul></div>';
     var elements = [];
     $('.nav-tabs').append(tab);
     $('.tab-content').append(tabPane);
 
     for (var messageKey in rooms[room]) {
-      console.log(rooms[room][messageKey]);
       message = rooms[room][messageKey];
       if (message['username'] !== undefined) {
-        elements.push("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message['roomname']) + "</strong>: " + app.escapeHtml(message['text']) + "</li>");
+        elements.push("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message['username']) + "</strong>: " + app.escapeHtml(message['text']) + "</li>");
       }
     }
     $('#' + room + ' ul').append(elements.join(''));

@@ -1,11 +1,10 @@
 $(document).ready(function () {
 
-$('.submit').on('click', app.handleSubmit);
+  $('.submit').on('click', app.handleSubmit);
 
-$('.tabber').click(function (e) {
-  e.preventDefault();
-  console.log(e);
-  $(this).tab('show');
-});
+  $('.tabber a').click(function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
 
 });
