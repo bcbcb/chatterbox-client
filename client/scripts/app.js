@@ -39,7 +39,7 @@ app.fetch = function () {
 };
 
 app.addMessage = function (message) {
-  $('#chats').append("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text) + "</li>");
+  $('#chats').prepend("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text)  + "</li>");
 };
 
 app.displayMessages = function (data) {
@@ -47,12 +47,12 @@ app.displayMessages = function (data) {
   app.messages = data.results;
   var elements = [];
   for (var i = 0; i < app.messages.length; i++) {
-    //console.log(app.messages[i].username + " " + app.messages[i].objectId);
+    //console.log(app.messages[i].username + " " + app.messages[i].roomname) ;
     if (app.messages[i]['username'] !== undefined) {
       elements.push("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(app.messages[i]['username']) + "</strong>: " + app.escapeHtml(app.messages[i]['text']) + "</li>");
     }
   }
-  $('ul').append(elements.join(''));
+  $('ul#chats').append(elements.join(''));
 };
 
 app.clearMessages = function () {
@@ -64,6 +64,7 @@ app.addRoom = function (room) {
 };
 
 app.escapeHtml = function (string) {
+  // return string;
   var entityMap = {
       "&": "&amp;",
       "<": "&lt;",
@@ -75,6 +76,38 @@ app.escapeHtml = function (string) {
   return String(string).replace(/[&<>"'\/]/g, function (s) {
     return entityMap[s];
   });
+};
+
+app.handleSubmit = function () {
+  var username = window.location.search.split('=')[1];
+  var text = $('#message').val();
+
+  var message = {
+    'username' : username,
+    'text' : text,
+    'roomname' : 'Hack Reactor'
+  };
+  app.send(message);
+  $('#message').val('');
+};
+
+
+app.displayRooms = function () {
+//Iterate through the objects on the GET request
+  var rooms = {};
+  var roomNames = [];
+  for (var key in app.messages) {
+    //Create an object to store all room names
+    if (rooms[app.messages[key]['roomname']]) {
+      rooms[app.messages[key]['roomname']] += 1; //increment if the key already exists
+    } else {
+      rooms[app.messages[key]['roomname']] = 1; //set to 1 if a new key
+    }
+  }
+  for (var room in rooms) {
+    roomNames.push('<li>' + room + '</li>');
+  }
+  $('.rooms').append(roomNames.join(''));
 };
 
 app.init();

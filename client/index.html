@@ -15,15 +15,21 @@
     <script src="scripts/events.js"></script>
   </head>
   <body>
-    <div id="main">
-      <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
-      <ul class='list-group' id='chats'>
-      </ul>
-      <div class="container">
-        <textarea id="chatMessage" placeholder="Enter message" rows="6" cols="57"></textarea>
-        <div>
-          <button type="button" class="btn btn-success">Submit</button>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <h1>chatterbox</h1>
+          <!-- Your HTML goes here! -->
+          <ul class='list-group' id='chats'>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <textarea id="message" placeholder="Enter message" rows="6" cols="57"></textarea>
+          <div>
+            <button type="button" class="btn btn-success submit" id="send">Submit</button>
+          </div>
+          <ul class="rooms">
+          </ul>
         </div>
       </div>
     </div>
