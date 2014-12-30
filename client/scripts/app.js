@@ -5,7 +5,7 @@ app.init = function () {
   this.fetch();
   app.displayRooms();
   setInterval( function() {
-    app.displayRooms();
+    app.displayMessages();
   }, 5000);
 };
 
@@ -39,7 +39,13 @@ app.fetch = function () {
 };
 
 app.addMessage = function (message) {
-  $('#chats').prepend("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text)  + "</li>");
+  //$('#chats').prepend("<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message.username) + "</strong>: " + app.escapeHtml(message.text)  + "</li>");
+  console.log(message['roomname']);
+  var element = "<li class='list-group-item'>" + "<strong>" + app.escapeHtml(message['username']) + "</strong>: " + app.escapeHtml(message['text']) + "</li>";
+  console.log(element);
+  $('#' + message['roomname'] + ' ul').prepend(element);
+  app.displayMessages();
+
 };
 
 app.displayMessages = function (data) {
