@@ -80,6 +80,13 @@ app.escapeHtml = function (string) {
   });
 };
 
+app.escapeRoom = function (string) {
+  if (string.indexOf(" ") === 1) {
+    string.split(' ').join('');
+  }
+  return string;
+};
+
 app.handleSubmit = function () {
   var username = window.location.search.split('=')[1];
   var text = $('#message').val();
