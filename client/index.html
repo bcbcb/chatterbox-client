@@ -12,13 +12,20 @@
     <!-- your scripts -->
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
+    <script src="scripts/events.js"></script>
   </head>
   <body>
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <ul class='list-group'>
+      <ul class='list-group' id='chats'>
       </ul>
+      <div class="container">
+        <textarea id="chatMessage" placeholder="Enter message" rows="6" cols="57"></textarea>
+        <div>
+          <button type="button" class="btn btn-success">Submit</button>
+        </div>
+      </div>
     </div>
   </body>
 </html>
