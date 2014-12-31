@@ -8,6 +8,7 @@ app.init = function () {
   app.createDropDown(app.rooms);
   this.fetch(app.room);
   setInterval( function() {
+    // app.rooms = app.getRooms();
     app.fetch(app.room);
     app.createDropDown(app.rooms);
   }, 500);
@@ -84,7 +85,11 @@ app.displayMessages = function () {
   var elements = [];
   for (var i = 0; i < app.messages.length; i++) {
     if (app.messages[i]['username'] !== undefined) {
-      elements.push("<li class='list-group-item'>" + "<strong class='username'>" + app.escapeHtml(app.messages[i]['username']) + "</strong>: " + app.escapeHtml(app.messages[i]['text']) + "</li>");
+      if (app.friends.indexOf(app.messages[i]['username']) > -1) {
+        elements.push("<li class='list-group-item friend'>" + "<strong class='username'>" + app.escapeHtml(app.messages[i]['username']) + "</strong>: " + app.escapeHtml(app.messages[i]['text']) + "</li>");
+      } else {
+        elements.push("<li class='list-group-item'>" + "<strong class='username'>" + app.escapeHtml(app.messages[i]['username']) + "</strong>: " + app.escapeHtml(app.messages[i]['text']) + "</li>");
+      }
     }
   }
   $('ul#chats').append(elements.join(''));
@@ -114,7 +119,6 @@ app.addRoom = function (room) {
 };
 
 app.escapeHtml = function (string) {
-  // return string;
   var entityMap = {
       "&": "&amp;",
       "<": "&lt;",

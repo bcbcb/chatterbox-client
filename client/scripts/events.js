@@ -18,7 +18,10 @@ $(document).ready(function () {
 
   $('body').on('click', '.username', function (e) {
     e.preventDefault();
-    app.addFriend($(this).text());
+    if (app.friends.indexOf($(this).text()) === -1) {
+      app.addFriend($(this).text());
+      $('table').append("<tr><td>" + $(this).text() + "</td></tr>");
+    }
   });
 
 });
