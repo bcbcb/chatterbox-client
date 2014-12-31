@@ -1,19 +1,20 @@
- <!doctype html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Chatterbox jQuery</title>
+    <title>Chatterbox Backbone</title>
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
 
     <!-- dependencies -->
     <script src="bower_components/jquery/jquery.min.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
     <!-- your scripts -->
     <script src="env/config.js"></script>
-    <script src="scripts/app.js"></script>
-    <script src="scripts/events.js"></script>
+    <script src="scripts/backboneapp.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
@@ -52,5 +53,15 @@
           </div>
         </div>
     </div>
+
+    <script>
+      $(function() {
+        var messages = new Messages();
+        messages.loadMessages();
+        var messagesView = new MessagesView({el: $('#chats'), collection: messages }); //sets messages as the collection in the view
+        messagesView.render();
+        console.log(messages);
+      });
+    </script>
   </body>
 </html>
