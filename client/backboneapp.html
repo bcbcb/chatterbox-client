@@ -24,7 +24,7 @@
           <ul class="nav navbar-nav">
             <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Rooms<span class="caret"></span></a>
-            <ul class="dropdown-menu" role="menu" id="roomMenu">
+            <ul class="dropdown-menu" role="menu" id="roomMenu"></ul>
           </ul>
         </div>
       </div>
@@ -38,7 +38,7 @@
           <ul class='list-group' id='chats'>
           </ul>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" id="submitter">
           <h3>Enter Message</h3>
           <textarea id="message" placeholder="Enter message" rows="6" cols="57"></textarea>
           <div>
@@ -58,9 +58,10 @@
       $(function() {
         var messages = new Messages();
         messages.loadMessages();
+        var formView = new FormView({el: $('#submitter'), collection: messages});
         var messagesView = new MessagesView({el: $('#chats'), collection: messages }); //sets messages as the collection in the view
-        messagesView.render();
-        console.log(messages);
+        //var roomsView = new RoomsView({el: $('#roomMenu'), collection: messages});
+        setInterval( messages.loadMessages.bind(messages), 1000 );
       });
     </script>
   </body>
